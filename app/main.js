@@ -19,6 +19,7 @@ import { syncHistoryWithStore } from 'react-router-redux';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import FontFaceObserver from 'fontfaceobserver';
 import { useScroll } from 'react-router-scroll';
+import 'three';
 import 'normalize.css/normalize.css';
 import './main.scss';
 

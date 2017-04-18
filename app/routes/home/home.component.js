@@ -1,53 +1,42 @@
-import React, { PureComponent, PropTypes } from 'react';
-import Helmet from 'react-helmet';
-import { FormattedMessage } from 'react-intl';
-import envConfig from 'env-config';
+import React, { PureComponent } from 'react';
+import * as THREE from 'three';
 
-import messages from './home.messages';
-import { MaintainerList } from './maintainerList/maintainerList.component';
-import { LanguageSelector } from './languageSelector/languageSelector.component';
-
+import { PerformanceMonitor } from '../components/performanceMonitor/performanceMonitor.component';
 
 export class Home extends PureComponent {
-  static propTypes = {
-    items: PropTypes.object,
-    language: PropTypes.string.isRequired,
-    fetchMaintainers: PropTypes.func.isRequired,
-    setLanguage: PropTypes.func.isRequired,
-    router: PropTypes.object.isRequired,
+  constructor() {
+    super();
+    this.scene = new THREE.Scene();
+    this.aspect = window.innerWidth / window.innerHeight;
+    this.camera = new THREE.PerspectiveCamera(100, this.aspect, 0.1, 1000);
+    this.renderer = new THREE.WebGLRenderer();
+    this.cube = null;
+  }
+
+  componentDidMount() {
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.home.appendChild(this.renderer.domElement);
+
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshNormalMaterial();
+    this.cube = new THREE.Mesh(geometry, material);
+    this.scene.add(this.cube);
+    this.camera.position.z = 5;
+
+    this.init();
+  }
+
+  init = () => {
+    requestAnimationFrame(this.init);
+    this.cube.rotation.x += 0.02;
+    this.cube.rotation.y += 0.01;
+    this.renderer.render(this.scene, this.camera);
   };
-
-  componentWillMount() {
-    this.props.fetchMaintainers(this.props.language);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.language !== this.props.language) {
-      this.props.fetchMaintainers(nextProps.language);
-    }
-  }
 
   render() {
     return (
-      <div className="home">
-        <Helmet
-          title="Homepage"
-        />
-
-        <h1 className="home__title">
-          <i className="home__title-logo" />
-          <FormattedMessage {...messages.welcome} />
-        </h1>
-
-        <div>Environment: {envConfig.name}</div>
-
-        <MaintainerList items={this.props.items} />
-
-        <LanguageSelector
-          language={this.props.language}
-          setLanguage={this.props.setLanguage}
-          router={this.props.router}
-        />
+      <div className="home" ref={(home) => {this.home = home;}} >
+        <PerformanceMonitor />
       </div>
     );
   }
