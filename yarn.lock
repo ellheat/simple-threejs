@@ -7811,6 +7811,26 @@ text-table@~0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
 
+three-addons@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/three-addons/-/three-addons-1.0.2.tgz#103b56eb422933a9b406784fcf1b9139e8af051d"
+  dependencies:
+    three "^0.84.0"
+
+three-copyshader@0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/three-copyshader/-/three-copyshader-0.0.1.tgz#ddfa6c3f5dbce596187cfbf4ce1b46c7fbd456c0"
+
+three-effectcomposer@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/three-effectcomposer/-/three-effectcomposer-0.0.1.tgz#09f438bfc76e522a985e5b8867d6b407eddd1d12"
+  dependencies:
+    three-copyshader "0.0.1"
+
+three-orbit-controls@^82.1.0:
+  version "82.1.0"
+  resolved "https://registry.yarnpkg.com/three-orbit-controls/-/three-orbit-controls-82.1.0.tgz#11a7f33d0a20ecec98f098b37780f6537374fab4"
+
 three@^0.84.0:
   version "0.84.0"
   resolved "https://registry.yarnpkg.com/three/-/three-0.84.0.tgz#95be85a55a0fa002aa625ed559130957dcffd918"

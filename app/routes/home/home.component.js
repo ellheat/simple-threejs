@@ -1,30 +1,82 @@
 import React, { PureComponent } from 'react';
-import * as THREE from 'three';
+import * as THREE_JS from 'three';
+import * as THREE_ADDONS from 'three-addons';
 import { random } from 'lodash';
-
 import { PerformanceMonitor } from '../components/performanceMonitor/performanceMonitor.component';
 
+const knightUrl = require('!!file-loader?name=[hash].[name].js!../../models/knight'); //eslint-disable-line
+const OrbitControls = require('three-orbit-controls')(THREE_JS);
+
+const THREE = { ...THREE_JS, ...THREE_ADDONS };
 const APPTENSION_GREEN = 0x95d32c;
+const GREY = 0x0e141c;
 const NUMBER_OF_ELEMENTS = 50;
 const STARTING_POSITION = -26;
 const DELAY = 500;
+
 
 export class Home extends PureComponent {
   constructor() {
     super();
     this.camera = null;
+    this.controls = null;
+    this.loader = new THREE.JSONLoader();
     this.scene = new THREE.Scene();
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.light = new THREE.DirectionalLight(APPTENSION_GREEN, 1.7);
+    this.composer = new THREE.EffectComposer(this.renderer);
+    this.mixer = new THREE.AnimationMixer(this.scene);
+    this.clock = new THREE.Clock();
     this.cubesArray = [];
   }
 
   componentDidMount() {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.home.appendChild(this.renderer.domElement);
+    this.initLights();
     this.initCamera();
+    this.initControls();
+    this.initWall();
     this.initCubes();
+    this.initModel();
     this.animation();
+  }
+
+  initModel = () => {
+    this.loader.load(knightUrl, (geometry, materials) => {
+      this.createModel(geometry, materials);
+    });
+  };
+
+  createModel(geometry, materials) {
+    const model = new THREE.Mesh(geometry, materials[0]);
+    model.position.set(0, 0, 0);
+    model.scale.set(1, 1, 1);
+
+    this.scene.add(model);
+  }
+
+  initWall = () => {
+    const planeGeometry = new THREE.PlaneGeometry(200, 200, 1);
+    const material = new THREE.MeshPhongMaterial({ color: GREY, aoMapIntensity: 0 });
+    const plane = new THREE.Mesh(planeGeometry, material);
+
+    plane.position.set(0, 0, -50);
+
+    this.scene.add(plane);
+  };
+
+  initLights = () => {
+    const directionalLight = new THREE.DirectionalLight(0xdddddd, 0.7);
+    const directionalLight2 = new THREE.DirectionalLight(0xdddddd, 0.7);
+
+    directionalLight.position.set(0.35, 0, 1).normalize();
+    directionalLight2.position.set(-0.35, 0, 1).normalize();
+
+    this.scene.add(directionalLight, directionalLight2);
+  };
+
+  initControls() {
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
   }
 
   initCamera() {
@@ -39,26 +91,19 @@ export class Home extends PureComponent {
     const bottom = -viewSize / 2;
 
     this.camera = new THREE.OrthographicCamera(left, right, top, bottom, -1000, 1000);
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
   }
 
-  createCube(geometry, material) {
+  createCube(boxGeometry, material) {
     const cube = {
-      element: new THREE.Mesh(geometry, material),
-      speed: random(0.07, 0.2),
+      element: new THREE.Mesh(boxGeometry, material),
+      speed: random(0.03, 0.1),
       scale: random(0.5, 1.3),
     };
 
-    cube.element.position.x = random(-100.0, 40.0);
-    cube.element.position.y = STARTING_POSITION;
-    cube.element.position.z = random(-40.0, 40.0);
-
-    cube.element.scale.y = cube.scale;
-    cube.element.scale.x = cube.scale;
-    cube.element.scale.z = cube.scale;
-
-    cube.element.rotation.x = random(0.1, 1);
-    cube.element.rotation.y = random(0.1, 1);
-    cube.element.rotation.z = random(0.1, 1);
+    cube.element.position.set(random(-100.0, 40.0), STARTING_POSITION, random(-40.0, 40.0));
+    cube.element.scale.set(cube.scale, cube.scale, cube.scale);
+    cube.element.rotation.set(random(0.1, 1), random(0.1, 1), random(0.1, 1));
 
     this.cubesArray.push(cube);
     this.scene.add(cube.element);
@@ -70,15 +115,12 @@ export class Home extends PureComponent {
   };
 
   initCubes() {
-    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const boxGeometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshPhongMaterial({ color: APPTENSION_GREEN });
-
-    this.light.position.set(0, 0, 1).normalize();
-    this.scene.add(this.light);
 
     for (let i = this.cubesArray.length; i < NUMBER_OF_ELEMENTS; i++) {
       setTimeout(() => {
-        this.createCube(geometry, material);
+        this.createCube(boxGeometry, material);
       }, DELAY + i * DELAY);
     }
   }
@@ -97,6 +139,9 @@ export class Home extends PureComponent {
     });
 
     this.renderer.render(this.scene, this.camera);
+    this.composer.render();
+    this.mixer.update(this.clock.getDelta());
+    this.controls.update();
   };
 
   render() {
