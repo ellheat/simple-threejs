@@ -5,8 +5,7 @@ import { random } from 'lodash';
 import { PerformanceMonitor } from '../components/performanceMonitor/performanceMonitor.component';
 
 const knightUrl = require('!!file-loader?name=[hash].[name].js!../../models/knight'); //eslint-disable-line
-const jsonUrl = require('!!file-loader?name=[hash].[name].js!../../models/1_9.json'); //eslint-disable-line
-// const monsterUrl = require('!!file-loader?name=[hash].[name].js!../../models/monster/monster'); //eslint-disable-line
+const jsonUrl = require('!!file-loader?name=[hash].[name].js!../../models/1_11.json'); //eslint-disable-line
 const OrbitControls = require('three-orbit-controls')(THREE_JS);
 
 const THREE = { ...THREE_JS, ...THREE_ADDONS };
@@ -23,12 +22,10 @@ export class Home extends PureComponent {
     this.camera = null;
     this.controls = null;
     this.loader = new THREE.JSONLoader();
-    // this.loader = new THREE.ObjectLoader();
     this.scene = new THREE.Scene();
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.composer = new THREE.EffectComposer(this.renderer);
     this.mixer = new THREE.AnimationMixer(this.scene);
-    // this.mixer = null;
     this.clock = new THREE.Clock();
     this.cubesArray = [];
   }
@@ -49,12 +46,6 @@ export class Home extends PureComponent {
     this.loader.load(jsonUrl, (geometry, materials) => {
       this.createModel(geometry, materials);
     });
-
-    // this.loader.load(jsonUrl, (object) => {
-    //   object.position.set(0, 0, 0);
-    //   object.scale.set(1, 1, 1);
-    //   this.scene.add(object);
-    // });
   };
 
   createModel(geometry, materials) {
@@ -64,9 +55,8 @@ export class Home extends PureComponent {
 
     const model = new THREE.Mesh(geometry, material);
 
-    model.position.set(-40, 0, 10);
+    model.position.set(0, 0, 10);
     model.scale.set(0.2, 0.2, 0.2);
-    model.rotation.set(1, 4, 1);
 
     model.matrixAutoUpdate = false;
     model.updateMatrix();
